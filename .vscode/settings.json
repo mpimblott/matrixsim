@@ -1,0 +1,6 @@
+{
+  "cmake.preferredGenerators": [
+    "Unix Makefiles"
+  ],
+  "cmake.generator": "Unix Makefiles"
+}

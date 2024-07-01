@@ -2,9 +2,9 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "driver/HUB75.h"
-#include "driver/display.h"
-#include "driver/driver.h"
+#include "HUB75.h"
+#include "display.h"
+#include "driver.h"
 
 constexpr uint8_t dummyData[192] = {
     0x00, 0x00, 0x00,  // black 1

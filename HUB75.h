@@ -5,7 +5,7 @@
 #include <bitset>
 #include <iostream>
 
-#include "../util.h"
+#include "util.h"
 #include "display.h"
 
 enum PinState {
@@ -55,6 +55,8 @@ private:
   bool bufferReady = false;
   void latchHigh();
   void latchLow();
+  void OEHigh();
+  void OELow();
   int getRow();
 };
 

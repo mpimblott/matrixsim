@@ -8,7 +8,7 @@
 #include <thread>
 #include <stdexcept>
 
-#include "Hub75.h"
+#include "HUB75.h"
 
 enum colour { colour8, colour565, greyscale };
 
@@ -34,5 +34,4 @@ class MatrixDriver {
   uint8_t colourBytes();
   void delay();
 };
-
 #endif

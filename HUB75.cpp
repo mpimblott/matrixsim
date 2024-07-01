@@ -1,4 +1,4 @@
-#include "Hub75.h"
+#include "HUB75.h"
 
 HUB75Connector::HUB75Connector(MatrixDisplay& display) : display(display) {
   for (int i = 0; i < 13; i++) {
@@ -15,9 +15,21 @@ void HUB75Connector::setPin(PinType type, PinState state) {
     clockHigh();
   } else if (type == Latch && state == HIGH) {
     latchHigh();
-  } else if (type == OE && state == LOW) {
+  } else if (type == Latch && state == LOW) {
     latchLow();
+  } else if (type == OE && state == HIGH) {
+    display.updateTexture();
   }
+}
+
+void OEHigh() {
+  // set the display to black
+  display.setBufferRGB(std::vector<uint8_t>(WIDTH * HEIGHT * 3, 0));
+}
+
+void OELow() {
+  // set the display to the buffer
+  display.updateTexture();
 }
 
 void HUB75Connector::print() {
@@ -51,6 +63,7 @@ void HUB75Connector::latchHigh() {
   print();
   // set the display buffer to the new data
   int row = getRow();
+  // pulsing the latch pin replaces the displayed data with the data just input
   display.setBufferRow(row, RReg1, GReg1, BReg1);
   display.setBufferRow(row + (WIDTH / 2), RReg2, GReg2, BReg2);
 }
