@@ -97,15 +97,15 @@ void MatrixDisplay::update() {
 }
 
 void MatrixDisplay::disableOutput() { 
-  matrixSprite.setTexture(blackTexture);
-  window.clear();
-  window.draw(matrixSprite);
-  window.display();
+  // matrixSprite.setTexture(blackTexture);
+  // window.clear();
+  // window.draw(matrixSprite);
+  // window.display();
 }
 
 void MatrixDisplay::enableOutput() { 
-  matrixSprite.setTexture(matrixTexture);
-  window.clear();
-  window.draw(matrixSprite);
-  window.display();
+  // matrixSprite.setTexture(matrixTexture);
+  // window.clear();
+  // window.draw(matrixSprite);
+  // window.display();
 }

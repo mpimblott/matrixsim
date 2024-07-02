@@ -75,7 +75,7 @@ constexpr uint8_t dummyData[192] = {
 
 int main() {
   sf::RenderWindow window(sf::VideoMode(500, 500), "test");
-  window.setFramerateLimit(600);
+  window.setFramerateLimit(15);
   MatrixDisplay display(window);
   HUB75Connector connector(display);
   MatrixDriver driver(connector, 1);
