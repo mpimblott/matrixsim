@@ -34,7 +34,7 @@ void MatrixDisplay::setBufferRow(int row, std::bitset<WIDTH> rBuffer,
 
 void MatrixDisplay::updateTexture() {
   matrixTexture.update(displayBuffer.data());
-  matrixSprite.setTexture(matrixTexture);
+  // matrixSprite.setTexture(matrixTexture);
 }
 
 /**
@@ -94,9 +94,18 @@ void MatrixDisplay::update() {
   updateTexture();
   window.draw(matrixSprite);
   window.display();
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
-void MatrixDisplay::disableOutput() { matrixSprite.setTexture(blackTexture); }
+void MatrixDisplay::disableOutput() { 
+  matrixSprite.setTexture(blackTexture);
+  window.clear();
+  window.draw(matrixSprite);
+  window.display();
+}
 
-void MatrixDisplay::enableOutput() { matrixSprite.setTexture(matrixTexture); }
+void MatrixDisplay::enableOutput() { 
+  matrixSprite.setTexture(matrixTexture);
+  window.clear();
+  window.draw(matrixSprite);
+  window.display();
+}

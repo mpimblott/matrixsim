@@ -23,8 +23,10 @@ class MatrixDriver {
   void loadRow(int row);
   void loadNextRow();
   std::bitset<WIDTH * N_SUBFRAMES> buildSubframeSequence(int buffer_idx);
+  void setBrightness(int brightness);
 
  private:
+  int brightness = 0;
   void clock();
   void latch();
   void setRowAddress(int row);
@@ -33,8 +35,9 @@ class MatrixDriver {
   ImgBuffer displayBuffer;
   colour colourMode;
   int selectedRow = 0;
-  std::chrono::milliseconds shiftDelay;
-  void delay();
+  int delay;
+  void offDelay();
+  void onDelay();
   int frameOrder[15] = {3,3,2,3,1,2,3,0,3,2,1,3,2,3,3};
   static int getSubframeBit(int frameNo);
 };

@@ -4,7 +4,7 @@ MatrixDriver::MatrixDriver(HUB75Connector &connector, int shiftDelay,
                            colour colourMode)
     : connector(connector),
       selectedRow(0),
-      shiftDelay(static_cast<std::chrono::milliseconds>(shiftDelay)),
+      delay(shiftDelay),
       colourMode(colourMode) {}
 
 void MatrixDriver::setBuffer(std::vector<uint8_t> buffer) {
@@ -17,10 +17,12 @@ void MatrixDriver::setBuffer(std::vector<uint8_t> buffer) {
  * @param row The row number to be set.
  */
 void MatrixDriver::setRowAddress(int row) {
+  connector.setPin(OE, LOW);
   connector.setPin(A, row & 0x01 ? HIGH : LOW);
   connector.setPin(B, row & 0x02 ? HIGH : LOW);
   connector.setPin(C, row & 0x04 ? HIGH : LOW);
   connector.setPin(D, row & 0x08 ? HIGH : LOW);
+  connector.setPin(OE, HIGH);
   selectedRow = row;
 }
 
@@ -54,10 +56,17 @@ void MatrixDriver::loadRow(int row) {
   }
 }
 
-void MatrixDriver::delay() { std::this_thread::sleep_for(shiftDelay); }
+void MatrixDriver::offDelay() { 
+  std::this_thread::sleep_for((100 - brightness) * 0.01 * std::chrono::milliseconds(delay));
+}
+void MatrixDriver::onDelay() { 
+  std::this_thread::sleep_for(brightness * 0.01 *std::chrono::milliseconds(delay));
+}
 
+/**
+ * Load the currently selected row and select the next one.
+ */
 void MatrixDriver::loadNextRow() {
-  std::cout << "Loading row " << selectedRow << std::endl;
   loadRow(selectedRow);
   selectedRow = (selectedRow + 1) % (HEIGHT / 2);
 }
@@ -70,9 +79,12 @@ void MatrixDriver::clock() {
  * Latching causes the current data to be displayed
  */
 void MatrixDriver::latch() {
+  connector.setPin(OE, LOW);
   connector.setPin(Latch, HIGH);
-  delay();
   connector.setPin(Latch, LOW);
+  offDelay();
+  connector.setPin(OE, HIGH);
+  onDelay();
 }
 
 int MatrixDriver::getSubframeBit(int frameNo) { return frameNo + 4; }
@@ -92,4 +104,11 @@ std::bitset<WIDTH * N_SUBFRAMES> MatrixDriver::buildSubframeSequence(
                         (1 << getSubframeBit(subframe)));
   }
   return sequence;
+}
+
+void MatrixDriver::setBrightness(int brightness) {
+  if (brightness < 0 || brightness > 100) {
+    throw std::invalid_argument("Brightness must be between 0 and 100");
+  }
+  this->brightness = brightness;
 }

@@ -18,17 +18,18 @@ void HUB75Connector::setPin(PinType type, PinState state) {
   } else if (type == Latch && state == LOW) {
     latchLow();
   } else if (type == OE && state == HIGH) {
+    OEHigh();
+  } else if (type == OE && state == LOW) {
+    OELow();
   }
 }
 
 void HUB75Connector::OEHigh() {
-  // set the display to black
-  display.setBufferRGB(std::vector<uint8_t>(WIDTH * HEIGHT * 3, 0));
+  display.enableOutput();
 }
 
 void HUB75Connector::OELow() {
-  // set the display to the buffer
-  // display.updateTexture();
+  display.disableOutput();
 }
 
 void HUB75Connector::print() {
@@ -59,7 +60,7 @@ void HUB75Connector::clockHigh() {
 }
 
 void HUB75Connector::latchHigh() {
-  print();
+  // print();
   // set the display buffer to the new data
   int row = getRow();
   // pulsing the latch pin replaces the displayed data with the data just input

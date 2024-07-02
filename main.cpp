@@ -26,7 +26,7 @@ constexpr uint8_t dummyData[192] = {
     0x00, 0x00, 0x00,  // black 1
     0xFF, 0xFF, 0xFF,  // white 2
     0x00, 0x00, 0x00,  // black 3
-    0xFF, 0xFF, 0xFF,  // white 4
+    0xFF, 0xFF, 0x55,  // white 4
     0x00, 0x00, 0x00,  // black 5
     0xFF, 0xFF, 0xFF,  // white 6
     0x00, 0x00, 0x00,  // black 7
@@ -75,10 +75,10 @@ constexpr uint8_t dummyData[192] = {
 
 int main() {
   sf::RenderWindow window(sf::VideoMode(500, 500), "test");
-  window.setFramerateLimit(15);
+  window.setFramerateLimit(600);
   MatrixDisplay display(window);
   HUB75Connector connector(display);
-  MatrixDriver driver(connector, 100);
+  MatrixDriver driver(connector, 1);
   std::vector<uint8_t> charVector(
       dummyData, dummyData + sizeof(dummyData) / sizeof(uint8_t));
 
@@ -95,6 +95,7 @@ int main() {
   // }
 
   driver.setBuffer(charVector);
+  driver.setBrightness(100);
 
   // driver.buildSubframeSequence(0);
 
