@@ -1,31 +1,14 @@
 #include "driver.h"
 
-MatrixDriver::MatrixDriver(HUB75Connector& connector, int width, int height,
-                           int shiftDelay, colour colourMode)
+MatrixDriver::MatrixDriver(HUB75Connector &connector, int shiftDelay,
+                           colour colourMode)
     : connector(connector),
-      width(width),
-      height(height),
       selectedRow(0),
       shiftDelay(static_cast<std::chrono::milliseconds>(shiftDelay)),
-      colourMode(colourMode) {
-  displayBuffer = std::vector<uint8_t>(width * height * 3, 0);
-}
+      colourMode(colourMode) {}
 
 void MatrixDriver::setBuffer(std::vector<uint8_t> buffer) {
-  displayBuffer = buffer;
-}
-
-uint8_t MatrixDriver::colourBytes() {
-  switch (colourMode) {
-    case greyscale:
-      return 1;
-    case colour565:
-      return 1;
-    case colour8:
-      return 3;
-    default:
-      throw std::runtime_error("Invalid colour mode");
-  }
+  displayBuffer.setBuffer(buffer);
 }
 
 /**
@@ -42,15 +25,16 @@ void MatrixDriver::setRowAddress(int row) {
 }
 
 /**
- * Pushes data for the specified row index pair into the connector by setting the RBG pins and clocking.
+ * Pushes data for the specified row index pair into the connector by setting
+ * the RBG pins and clocking.
  *
  * @param row The row number to be loaded.
  */
 void MatrixDriver::loadRow(int row) {
   setRowAddress(row);
-  const int start_idx_top = width * row * 3;
-  const int start_idx_bottom = (row + height / 2) * width * 3;
-  for (int i = 0; i < width * 3; i += 3) {
+  const int start_idx_top = WIDTH * row * 3;
+  const int start_idx_bottom = (row + HEIGHT / 2) * WIDTH * 3;
+  for (int i = 0; i < WIDTH * 3; i += 3) {
     int buffer_idx_top = start_idx_top + i;
     int buffer_idx_bottom = start_idx_bottom + i;
     // if we need to display any of a colour, set the pin high
@@ -58,10 +42,8 @@ void MatrixDriver::loadRow(int row) {
     connector.setPin(G1, displayBuffer[buffer_idx_top + 1] ? HIGH : LOW);
     connector.setPin(B1, displayBuffer[buffer_idx_top + 2] ? HIGH : LOW);
     connector.setPin(R2, displayBuffer[buffer_idx_bottom] ? HIGH : LOW);
-    connector.setPin(G2,
-                     displayBuffer[buffer_idx_bottom + 1] ? HIGH : LOW);
-    connector.setPin(B2,
-                     displayBuffer[buffer_idx_bottom + 2] ? HIGH : LOW);
+    connector.setPin(G2, displayBuffer[buffer_idx_bottom + 1] ? HIGH : LOW);
+    connector.setPin(B2, displayBuffer[buffer_idx_bottom + 2] ? HIGH : LOW);
     clock();
   }
   latch();
@@ -72,7 +54,7 @@ void MatrixDriver::delay() { std::this_thread::sleep_for(shiftDelay); }
 void MatrixDriver::loadNextRow() {
   std::cout << "Loading row " << selectedRow << std::endl;
   loadRow(selectedRow);
-  selectedRow = (selectedRow + 1) % (height / 2);
+  selectedRow = (selectedRow + 1) % (HEIGHT / 2);
 }
 
 void MatrixDriver::clock() {
@@ -80,9 +62,30 @@ void MatrixDriver::clock() {
   delay();
   connector.setPin(CLK, LOW);
 }
-
+/*
+ * Latching causes the current data to be displayed
+ */
 void MatrixDriver::latch() {
   connector.setPin(Latch, HIGH);
   delay();
   connector.setPin(Latch, LOW);
+}
+
+int MatrixDriver::getSubframeBit(int frameNo) { return frameNo + 4; }
+
+/*
+ * Build the bitset that comprises the pin states for all the subframes of a
+ * given colour
+ */
+std::bitset<WIDTH * N_SUBFRAMES> MatrixDriver::buildSubframeSequence(
+    int buffer_idx) {
+  std::bitset<WIDTH * N_SUBFRAMES> sequence;
+  for (int i = 0; i < WIDTH * N_SUBFRAMES; i++) {
+    int frame = i / WIDTH;
+    int pixel = i % WIDTH;
+    int subframe = frameOrder[frame];
+    sequence.set(i, displayBuffer.colSequence(buffer_idx, pixel) &
+                        (1 << getSubframeBit(subframe)));
+  }
+  return sequence;
 }

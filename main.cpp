@@ -14,7 +14,7 @@ constexpr uint8_t dummyData[192] = {
     0x00, 0x00, 0x00,  // black 5
     0xFF, 0xFF, 0xFF,  // white 6
     0x00, 0x00, 0x00,  // black 7
-    0xFF, 0xFF, 0xFF,  // white 8
+    0x00, 0xFF, 0xFF,  // white 8
     0x00, 0x00, 0x00,  // black 1
     0xFF, 0xFF, 0xFF,  // white 2
     0x00, 0x00, 0x00,  // black 3
@@ -78,7 +78,7 @@ int main() {
   window.setFramerateLimit(15);
   MatrixDisplay display(window);
   HUB75Connector connector(display);
-  MatrixDriver driver(connector, 8, 8, 100);
+  MatrixDriver driver(connector, 100);
   std::vector<uint8_t> charVector(
       dummyData, dummyData + sizeof(dummyData) / sizeof(uint8_t));
 
@@ -96,17 +96,12 @@ int main() {
 
   driver.setBuffer(charVector);
 
-  while (display.isOpen()) {
-    driver.loadNextRow();
-    display.update();
-  }
+  driver.buildSubframeSequence(0);
 
-  // // load the texture and assign it to the sprite
-  // sf::Texture texture;
-  // texture.create(8, 8);
-  // texture.update(charVector.data());
-  // sf::Sprite shape(texture);
-  // shape.setScale(25, 25);
+  // while (display.isOpen()) {
+  //   driver.loadNextRow();
+  //   display.update();
+  // }
 
   return 0;
 }

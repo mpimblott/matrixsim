@@ -14,6 +14,8 @@ set(SOURCES
   driver.cpp
   display.h
   display.cpp
+  imgBuffer.h
+  imgBuffer.cpp
 )
 
  

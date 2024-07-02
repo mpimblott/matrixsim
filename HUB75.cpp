@@ -18,18 +18,17 @@ void HUB75Connector::setPin(PinType type, PinState state) {
   } else if (type == Latch && state == LOW) {
     latchLow();
   } else if (type == OE && state == HIGH) {
-    display.updateTexture();
   }
 }
 
-void OEHigh() {
+void HUB75Connector::OEHigh() {
   // set the display to black
   display.setBufferRGB(std::vector<uint8_t>(WIDTH * HEIGHT * 3, 0));
 }
 
-void OELow() {
+void HUB75Connector::OELow() {
   // set the display to the buffer
-  display.updateTexture();
+  // display.updateTexture();
 }
 
 void HUB75Connector::print() {
