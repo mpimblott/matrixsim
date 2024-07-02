@@ -18,10 +18,13 @@ class MatrixDisplay {
   void setBufferRGB(std::vector<uint8_t> buffer);
   void printBuffer();
   void printBufferRow(int row);
+  void disableOutput();
+  void enableOutput();
 
  private:
   sf::RenderWindow& window;
   sf::Texture matrixTexture;
+  sf::Texture blackTexture;
   sf::Sprite matrixSprite;
   std::array<uint8_t, WIDTH * HEIGHT * 4> displayBuffer = {}; // Initialize to 0
   void updateTexture();
