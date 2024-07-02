@@ -96,12 +96,12 @@ int main() {
 
   driver.setBuffer(charVector);
 
-  driver.buildSubframeSequence(0);
+  // driver.buildSubframeSequence(0);
 
-  // while (display.isOpen()) {
-  //   driver.loadNextRow();
-  //   display.update();
-  // }
+  while (display.isOpen()) {
+    driver.loadNextRow();
+    display.update();
+  }
 
   return 0;
 }

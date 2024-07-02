@@ -34,19 +34,24 @@ void MatrixDriver::loadRow(int row) {
   setRowAddress(row);
   const int start_idx_top = WIDTH * row * 3;
   const int start_idx_bottom = (row + HEIGHT / 2) * WIDTH * 3;
-  for (int i = 0; i < WIDTH * 3; i += 3) {
-    int buffer_idx_top = start_idx_top + i;
-    int buffer_idx_bottom = start_idx_bottom + i;
-    // if we need to display any of a colour, set the pin high
-    connector.setPin(R1, displayBuffer[buffer_idx_top] ? HIGH : LOW);
-    connector.setPin(G1, displayBuffer[buffer_idx_top + 1] ? HIGH : LOW);
-    connector.setPin(B1, displayBuffer[buffer_idx_top + 2] ? HIGH : LOW);
-    connector.setPin(R2, displayBuffer[buffer_idx_bottom] ? HIGH : LOW);
-    connector.setPin(G2, displayBuffer[buffer_idx_bottom + 1] ? HIGH : LOW);
-    connector.setPin(B2, displayBuffer[buffer_idx_bottom + 2] ? HIGH : LOW);
+  std::bitset<WIDTH * N_SUBFRAMES> r_top_seq = buildSubframeSequence(start_idx_top);
+  std::bitset<WIDTH * N_SUBFRAMES> r_bottom_seq = buildSubframeSequence(start_idx_bottom);
+  std::bitset<WIDTH * N_SUBFRAMES> g_top_seq = buildSubframeSequence(start_idx_top + 1);
+  std::bitset<WIDTH * N_SUBFRAMES> g_bottom_seq = buildSubframeSequence(start_idx_bottom + 1);
+  std::bitset<WIDTH * N_SUBFRAMES> b_top_seq = buildSubframeSequence(start_idx_top + 2);
+  std::bitset<WIDTH * N_SUBFRAMES> b_bottom_seq = buildSubframeSequence(start_idx_bottom + 2);
+  for (int i = 0; i < WIDTH * N_SUBFRAMES; i++) {
+    connector.setPin(R1, r_top_seq[i] ? HIGH : LOW);
+    connector.setPin(G1, g_top_seq[i] ? HIGH : LOW);
+    connector.setPin(B1, b_top_seq[i] ? HIGH : LOW);
+    connector.setPin(R2, r_bottom_seq[i] ? HIGH : LOW);
+    connector.setPin(G2, g_bottom_seq[i] ? HIGH : LOW);
+    connector.setPin(B2, b_bottom_seq[i] ? HIGH : LOW);
     clock();
+    if (i % WIDTH == 0) {
+      latch();
+    }
   }
-  latch();
 }
 
 void MatrixDriver::delay() { std::this_thread::sleep_for(shiftDelay); }
@@ -59,7 +64,6 @@ void MatrixDriver::loadNextRow() {
 
 void MatrixDriver::clock() {
   connector.setPin(CLK, HIGH);
-  delay();
   connector.setPin(CLK, LOW);
 }
 /*
