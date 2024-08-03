@@ -16,3 +16,6 @@ Simulated HUB75 header implementation and simple serial matrix panel driver.
 - Implement interface for displaying output from other rgb matrix libraries.
 - Add loader for loading display data from file.
 
+### License
+
+Distributed under MIT License
